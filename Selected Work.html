@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Selected Work | 王悠然</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap');
+        
+        body {
+            margin: 0;
+            background-color: #f2f2f2; /* 浅灰色背景，呼应参考图 */
+            color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        /* 轮播容器 */
+        .carousel-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 弧形卡片轨道 */
+        .carousel-track {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .work-card {
+            position: absolute;
+            width: 280px;
+            height: 380px;
+            background: white;
+            padding: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            transition: transform 0.1s ease-out;
+            cursor: pointer;
+            pointer-events: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .work-card img {
+            width: 100%;
+            height: 85%;
+            object-fit: cover;
+            filter: grayscale(100%);
+            transition: filter 0.5s ease;
+        }
+
+        .work-card:hover img {
+            filter: grayscale(0%);
+        }
+
+        .work-info {
+            padding: 15px 5px;
+            text-align: center;
+        }
+
+        .work-title {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        .work-category {
+            font-size: 9px;
+            opacity: 0.4;
+            margin-top: 4px;
+        }
+
+        /* 导航按钮 */
+        .nav-btn {
+            position: absolute;
+            bottom: 15%;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+            background: white;
+        }
+
+        .nav-btn:hover {
+            background: #1a1a1a;
+            color: white;
+            border-color: #1a1a1a;
+        }
+
+        .btn-left { left: calc(50% - 80px); }
+        .btn-right { right: calc(50% - 80px); }
+
+        /* 装饰元素 */
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .center-text h2 {
+            font-size: 12vw;
+            font-weight: 800;
+            color: rgba(0,0,0,0.03);
+            text-transform: uppercase;
+            line-height: 0.8;
+            letter-spacing: -0.05em;
+        }
+
+        .page-indicator {
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            letter-spacing: 0.3em;
+            font-weight: 500;
+            opacity: 0.3;
+        }
+
+        .section-tag {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 9px;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            opacity: 0.4;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航 -->
+    <nav class="fixed top-0 w-full flex justify-between px-12 py-10 z-50">
+        <div class="text-sm font-bold tracking-tighter cursor-pointer" onclick="location.reload()">W.STUDIO</div>
+        <div class="flex gap-10 text-[9px] uppercase tracking-widest opacity-50">
+            <span class="hover:opacity-100 transition-opacity cursor-pointer">About</span>
+            <span class="hover:opacity-100 transition-opacity cursor-pointer underline">Works</span>
+            <span class="hover:opacity-100 transition-opacity cursor-pointer">Contact</span>
+        </div>
+    </nav>
+
+    <div class="carousel-container">
+        <div class="section-tag">— Selected Works —</div>
+        
+        <div class="center-text">
+            <h2>Fiona Wang</h2>
+        </div>
+
+        <div id="carouselTrack" class="carousel-track">
+            <!-- 作品卡片将由 JS 生成 -->
+        </div>
+
+        <!-- 导航 -->
+        <div class="nav-btn btn-left" onclick="moveCarousel(-1)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+        </div>
+        <div class="nav-btn btn-right" onclick="moveCarousel(1)">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+        </div>
+
+        <div id="pageIndicator" class="page-indicator">01 / 05</div>
+    </div>
+
+    <!-- 底部标识 -->
+    <footer class="fixed bottom-10 w-full px-12 flex justify-between items-center opacity-30 text-[8px] tracking-[0.4em]">
+        <div>© 2026 VISUAL ARCHIVE</div>
+        <div class="flex gap-4">
+            <span>INSTAGRAM</span>
+            <span>BEHANCE</span>
+        </div>
+    </footer>
+
+    <script>
+        const works = [
+            { title: "Visual Narrative", category: "Graphic Design", img: "https://images.unsplash.com/photo-1558655146-d09347e92766?q=80&w=1000&auto=format&fit=crop" },
+            { title: "Digital Texture", category: "3D Animation", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1000&auto=format&fit=crop" },
+            { title: "Future Grammar", category: "Identity", img: "https://images.unsplash.com/photo-1534127391941-ef99ec939bd2?q=80&w=1000&auto=format&fit=crop" },
+            { title: "Sense Boundary", category: "UI/UX Experience", img: "https://images.unsplash.com/photo-1634986666676-ec8fd927c23d?q=80&w=1000&auto=format&fit=crop" },
+            { title: "Motion Archive", category: "Motion Graphics", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop" }
+        ];
+
+        let currentIndex = 0;
+        const track = document.getElementById('carouselTrack');
+        const cards = [];
+
+        // 初始化创建卡片
+        function initCarousel() {
+            works.forEach((work, i) => {
+                const card = document.createElement('div');
+                card.className = 'work-card';
+                card.innerHTML = `
+                    <img src="${work.img}" alt="${work.title}">
+                    <div class="work-info">
+                        <div class="work-title">${work.title}</div>
+                        <div class="work-category">${work.category}</div>
+                    </div>
+                `;
+                track.appendChild(card);
+                cards.push(card);
+            });
+            updateCarousel();
+        }
+
+        function updateCarousel() {
+            const radius = 800; // 弧形半径
+            const angleStep = 0.25; // 卡片间的弧度间隔
+
+            cards.forEach((card, i) => {
+                const diff = i - currentIndex;
+                const angle = diff * angleStep;
+                
+                // 计算弧形位置 (参考图中的卡片沿圆弧排列)
+                const x = Math.sin(angle) * radius;
+                const z = Math.cos(angle) * radius - radius; // z轴负方向偏移
+                const rotationY = angle * 20; // 绕Y轴旋转，产生扇面效果
+
+                // 使用 GSAP 平滑动画
+                gsap.to(card, {
+                    x: x,
+                    z: z,
+                    rotationY: rotationY,
+                    rotationZ: diff * -5, // 微弱的倾斜增加动感
+                    scale: 1 - Math.abs(diff) * 0.15,
+                    opacity: 1 - Math.abs(diff) * 0.4,
+                    duration: 1,
+                    ease: "expo.out",
+                    zIndex: 100 - Math.abs(diff) * 10,
+                    pointerEvents: i === currentIndex ? "auto" : "none"
+                });
+            });
+
+            // 更新页码
+            document.getElementById('pageIndicator').innerText = `0${currentIndex + 1} / 0${works.length}`;
+        }
+
+        function moveCarousel(dir) {
+            currentIndex = (currentIndex + dir + works.length) % works.length;
+            updateCarousel();
+        }
+
+        // 鼠标滚轮切换
+        window.addEventListener('wheel', (e) => {
+            if (Math.abs(e.deltaY) > 50) {
+                moveCarousel(e.deltaY > 0 ? 1 : -1);
+            }
+        }, { passive: true });
+
+        initCarousel();
+    </script>
+</body>
+</html>

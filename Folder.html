@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Me | 王悠然 - Folder Interface</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;500;600&display=swap');
+        
+        body {
+            margin: 0;
+            background-color: #d8e5f2; /* 浅蓝色背景，参考图基调 */
+            color: #1a1a1a;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* 文件夹整体容器 */
+        .folder-wrapper {
+            width: 90%;
+            max-width: 1100px;
+            height: 75vh;
+            position: relative;
+            margin-top: 40px;
+        }
+
+        /* 物理标签样式 - 严格参考图片 */
+        .tab-bar {
+            position: absolute;
+            top: -46px;
+            left: 0;
+            display: flex;
+            align-items: flex-end;
+            padding-left: 20px;
+            z-index: 10;
+        }
+
+        .tab {
+            height: 46px;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.1em;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #555;
+            /* 梯形圆角效果 */
+            background: #cbd5e0;
+            border-radius: 12px 12px 0 0;
+            margin-right: -10px;
+            clip-path: polygon(10% 0, 90% 0, 100% 100%, 0% 100%);
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background: transparent;
+            transition: 0.3s;
+        }
+
+        /* 活动标签 - 亮灰色 */
+        .tab.active {
+            background: #94a3b8; /* 较深的灰蓝色，对应图中的 Studio 灰色 */
+            color: #1a1a1a;
+            z-index: 15;
+            height: 52px;
+            margin-top: -6px;
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
+            clip-path: polygon(5% 0, 95% 0, 100% 100%, 0% 100%);
+        }
+
+        .tab.active .underline {
+            width: 40%;
+            height: 1.5px;
+            background: #1a1a1a;
+            position: absolute;
+            bottom: 10px;
+        }
+
+        /* 文件夹主体 */
+        .folder-body {
+            width: 100%;
+            height: 100%;
+            background: #94a3b8; /* 核心灰色 */
+            border-radius: 0 15px 15px 15px;
+            box-shadow: 20px 20px 60px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 5;
+            padding: 60px;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* 内容面板切换 */
+        .panel {
+            display: none;
+            height: 100%;
+            animation: fadeIn 0.6s ease;
+        }
+
+        .panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 滚动条 */
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
+
+        /* 装饰元素 */
+        .folder-id {
+            position: absolute;
+            right: 40px;
+            top: 40px;
+            font-size: 40px;
+            font-weight: 200;
+            opacity: 0.8;
+            transform: rotate(90deg) scaleY(-1);
+            letter-spacing: -2px;
+        }
+
+        .divider {
+            width: 1px;
+            height: 100%;
+            background: rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 导航栏 -->
+    <nav class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-10 py-10 pointer-events-none mix-blend-diff">
+        <div class="text-xl font-bold tracking-tighter italic opacity-90 pointer-events-auto">W.STUDIO</div>
+        <div class="hidden md:flex gap-12 text-[10px] uppercase tracking-[0.5em] font-light opacity-40"></div>
+         <!-- 右边: 桌面导航 + 移动端汉堡菜单 -->
+    <div class="flex items-center pointer-events-auto">
+        <!-- 桌面导航链接 (隐藏在小屏幕上) -->
+        <div class="hidden md:flex items-center gap-5">
+            <a href="./Cover.html" class="group relative">
+                <div class="absolute -top-2 left-0 w-0 h-[1px] bg-white/60 group-hover:w-full transition-all duration-300"></div>
+                <span class="text-xs uppercase tracking-[0.3em] font-light opacity-60 hover:opacity-100 transition-opacity duration-200">Cover</span>
+                <div class="absolute -bottom-2 left-0 w-full h-[1px] bg-white/30 group-hover:bg-white/60 transition-colors duration-300"></div>
+            </a>
+            
+            <a href="./Chronos Memory Wheel.html" class="group relative">
+                <div class="absolute -top-2 left-0 w-0 h-[1px] bg-white/60 group-hover:w-full transition-all duration-300"></div>
+                <span class="text-xs uppercase tracking-[0.3em] font-light opacity-60 hover:opacity-100 transition-opacity duration-200">Chronos Memory Wheel</span>
+                <div class="absolute -bottom-2 left-0 w-full h-[1px] bg-white/30 group-hover:bg-white/60 transition-colors duration-300"></div>
+            </a>
+            
+            <a href="./Non-Fixed Calendar.html" class="group relative">
+                <div class="absolute -top-2 left-0 w-0 h-[1px] bg-white/60 group-hover:w-full transition-all duration-300"></div>
+                <span class="text-xs uppercase tracking-[0.3em] font-light opacity-60 hover:opacity-100 transition-opacity duration-200">Non-Fixed Calendar</span>
+                <div class="absolute -bottom-2 left-0 w-full h-[1px] bg-white/30 group-hover:bg-white/60 transition-colors duration-300"></div>
+            </a>
+        </div>
+        
+        <!-- 移动端汉堡菜单按钮 (只在手机显示) -->
+        <button class="md:hidden flex flex-col gap-1 pointer-events-auto">
+            <div class="w-6 h-[1px] bg-white/60"></div>
+            <div class="w-6 h-[1px] bg-white/60"></div>
+            <div class="w-6 h-[1px] bg-white/60"></div>
+        </button>
+    </div>
+</nav>
+
+    <div class="folder-wrapper">
+        <!-- 标签栏 -->
+        <div class="tab-bar">
+            <div class="tab active" onclick="switchTab(0)">
+                <span>NAME</span>
+                <div class="underline"></div>
+            </div>
+            <div class="tab" onclick="switchTab(1)">
+                <span>INFORMATION</span>
+                <div class="underline"></div>
+            </div>
+            <div class="tab" onclick="switchTab(2)">
+                <span>ABILITY</span>
+                <div class="underline"></div>
+            </div>
+        </div>
+
+        <!-- 文件夹主体 -->
+        <div class="folder-body">
+            
+            <!-- 右上角 LOGO 装饰 -->
+            <div class="folder-id">S Ω</div>
+
+            <!-- 面板 0: NAME -->
+            <div id="panel-0" class="panel active">
+                <div class="grid grid-cols-3 h-full">
+                    <div class="col-span-1 flex flex-col justify-center">
+                        <h1 class="text-6xl font-light tracking-tight mb-2">王悠然</h1>
+                        <p class="text-xl italic opacity-50 font-serif">Fiona Wang</p>
+                    </div>
+                    <div class="flex justify-center items-center"><div class="divider"></div></div>
+                    <div class="col-span-1 flex flex-col justify-center">
+                        <p class="text-sm leading-relaxed tracking-wider opacity-70">
+                            四川大学 · 视觉传达设计专业。<br><br>
+                            致力于数字媒体、交互设计与视觉审美的跨界探索。以逻辑驱动感官，用设计阐释叙事。
+                        </p>
+                    </div>
+                </div>
+                <div class="absolute bottom-12 left-12 h-[1px] w-[80%] bg-black opacity-10"></div>
+            </div>
+
+            <!-- 面板 1: INFORMATION -->
+            <div id="panel-1" class="panel h-full overflow-y-auto custom-scroll">
+                <div class="grid grid-cols-2 gap-20">
+                    <div class="space-y-12">
+                        <section>
+                            <h4 class="text-[10px] uppercase tracking-[0.4em] mb-6 opacity-40">Personal Profile</h4>
+                            <div class="grid grid-cols-2 text-xs tracking-wider gap-y-4 font-medium">
+                                <span class="opacity-40 uppercase">Birthday</span><span>2006.01.04</span>
+                                <span class="opacity-40 uppercase">Native</span><span>浙江省温州市</span>
+                                <span class="opacity-40 uppercase">Phone</span><span>15922958883</span>
+                                <span class="opacity-40 uppercase">Email</span><span>188178555@qq.com</span>
+                            </div>
+                        </section>
+                        <section>
+                            <h4 class="text-[10px] uppercase tracking-[0.4em] mb-6 opacity-40">Education</h4>
+                            <div class="text-xs tracking-widest leading-relaxed">
+                                <strong>四川大学|SCU (Sichuan University)</strong><br>
+                                <span class="opacity-60">设计与媒体体系 / 视觉传达设计</span><br>
+                                <span class="text-[9px] opacity-40">2024.09 —— PRESENT</span>
+                            </div>
+                        </section>
+                    </div>
+                    <div class="space-y-8">
+                        <h4 class="text-[10px] uppercase tracking-[0.4em] mb-6 opacity-40">Key Projects</h4>
+                        <div class="space-y-6">
+                            <div class="border-l-2 border-black/10 pl-6">
+                                <p class="text-xs font-semibold mb-1">德力西电气有限公司实习</p>
+                                <p class="text-[10px] opacity-50">人力资源部 · 2026.01 - 2026.03</p>
+                            </div>
+                            <div class="border-l-2 border-black/10 pl-6">
+                                <p class="text-xs font-semibold mb-1">设计马拉松 “银发工作坊”</p>
+                                <p class="text-[10px] opacity-50">海报设计与团队标识 · 2025</p>
+                            </div>
+                            <div class="border-l-2 border-black/10 pl-6">
+                                <p class="text-xs font-semibold mb-1">“未来语法” 成都国际艺术教育志愿者</p>
+                                <p class="text-[10px] opacity-50">艺术节策划与执行 · 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 面板 2: ABILITY -->
+            <div id="panel-2" class="panel">
+                <div class="grid grid-cols-3 gap-12 h-full items-center">
+                    <div class="col-span-1 space-y-10">
+                        <h4 class="text-[10px] uppercase tracking-[0.4em] opacity-40">Technical Skills</h4>
+                        <div class="space-y-6">
+                            <div class="text-[11px] tracking-widest space-y-2">
+                                <div class="flex justify-between"><span>ADOBE CREATIVE SUITE</span><span>95%</span></div>
+                                <div class="h-[1.5px] bg-black/5"><div class="h-full bg-black/60 w-[95%]"></div></div>
+                            </div>
+                            <div class="text-[11px] tracking-widest space-y-2">
+                                <div class="flex justify-between"><span>PPT PRESENTATION</span><span>90%</span></div>
+                                <div class="h-[1.5px] bg-black/5"><div class="h-full bg-black/60 w-[90%]"></div></div>
+                            </div>
+                            <div class="text-[11px] tracking-widest space-y-2">
+                                <div class="flex justify-between"><span>3D & TD (TOUCHDESIGNER)</span><span>75%</span></div>
+                                <div class="h-[1.5px] bg-black/5"><div class="h-full bg-black/60 w-[75%]"></div></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider mx-auto"></div>
+                    <div class="col-span-1">
+                        <h4 class="text-[10px] uppercase tracking-[0.4em] mb-8 opacity-40">Self Evaluation</h4>
+                        <p class="text-xs leading-loose font-light opacity-80 italic">
+                            “热爱历史文化与艺术，经常参观博物馆。具备优秀的手绘功底与逻辑思维，善于将共情力转化为应变能力与创作动力。”
+                        </p>
+                        <div class="mt-8 flex gap-2">
+                            <span class="px-2 py-1 bg-black/5 text-[8px] uppercase tracking-tighter">Team Spirit</span>
+                            <span class="px-2 py-1 bg-black/5 text-[8px] uppercase tracking-tighter">Proactive</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- 底部版权装饰 -->
+    <footer class="fixed bottom-8 w-full px-12 flex justify-between items-center opacity-30 text-[9px] tracking-[0.3em]">
+        <div>© 2026 ARCHIVE SYSTEM</div>
+        <div>FILE REF: SCU_VISUAL_STUDENT_001</div>
+    </footer>
+
+    <script>
+        function switchTab(index) {
+            const tabs = document.querySelectorAll('.tab');
+            const panels = document.querySelectorAll('.panel');
+            
+            tabs.forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
+            });
+
+            panels.forEach((panel, i) => {
+                if (i === index) {
+                    panel.classList.add('active');
+                    // 进场动画
+                    gsap.fromTo(panel, { opacity: 0, x: 20 }, { opacity: 1, x: 0, duration: 0.6, ease: "power2.out" });
+                } else {
+                    panel.classList.remove('active');
+                }
+            });
+        }
+
+        // 初始动效
+        window.onload = () => {
+            gsap.from(".folder-wrapper", { 
+                scale: 0.98, 
+                opacity: 0, 
+                y: 30, 
+                duration: 1.2, 
+                ease: "expo.out" 
+            });
+        }
+    </script>
+</body>
+</html>
